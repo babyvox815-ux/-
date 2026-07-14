@@ -1,0 +1,9 @@
+{
+  "name":"YONGHO GYM OS",
+  "short_name":"GYM OS",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#050a12",
+  "theme_color":"#07101d",
+  "icons":[]
+}

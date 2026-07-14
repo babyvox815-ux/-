@@ -1,0 +1,27 @@
+/* AI 시안에서 잘라낸 실제 운동 이미지 전용 보정 */
+.대표사진{
+  background-size:cover!important;
+  background-position:center bottom!important;
+  filter:saturate(.92) contrast(1.08) brightness(.78)!important;
+  transform:none!important;
+}
+.부위사진{
+  background-size:400% 600%!important;
+  background-repeat:no-repeat!important;
+  filter:saturate(.82) brightness(.67) contrast(1.08)!important;
+  transform:none!important;
+}
+.부위버튼.선택됨 .부위사진{
+  filter:saturate(.95) brightness(.8) contrast(1.08)!important;
+}
+.운동사진{
+  background-size:400% 600%!important;
+  background-repeat:no-repeat!important;
+  filter:saturate(.86) brightness(.82) contrast(1.08)!important;
+  background-color:#0d0e0d!important;
+}
+@media(max-width:420px){
+  .부위버튼{min-height:178px!important}
+  .운동카드{grid-template-columns:124px minmax(0,1fr)!important}
+  .운동사진{min-height:112px!important}
+}

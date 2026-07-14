@@ -1,0 +1,49 @@
+(() => {
+  'use strict';
+  const APP_KEY='yongho-gym-os-v8';
+  const SESSION_KEY='ygo-workout-session-v1';
+  const read=(k,f)=>{try{return JSON.parse(localStorage.getItem(k)||'null')||f}catch{return f}};
+  const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+  const date=()=>read(APP_KEY,{}).selectedDate||new Date().toISOString().slice(0,10);
+  const sessions=()=>read(SESSION_KEY,{});
+  let ticker=null;
+
+  function injectTheme(){
+    if(document.querySelector('#ygo-compact-gray'))return;
+    const s=document.createElement('style');s.id='ygo-compact-gray';s.textContent=`
+    :root{--bg:#111214!important;--surface:#191b1f!important;--surface-2:#202328!important;--surface-3:#292d33!important;--line:rgba(255,255,255,.09)!important;--text:#f2f3f5!important;--muted:#9b9fa6!important;--blue:#b7bcc4!important;--blue-2:#8e949d!important;--cyan:#c7cbd1!important;--green:#9ed6b5!important;--red:#d78690!important}
+    body{background:linear-gradient(180deg,#111214,#15171a)!important}.ambient{display:none!important}.app-shell{max-width:1040px!important}.app-header{padding:18px 0 12px!important}.app-header h1{font-size:clamp(24px,4vw,34px)!important}.card{background:linear-gradient(145deg,#1d2024,#17191c)!important;border-color:rgba(255,255,255,.08)!important;box-shadow:0 12px 30px rgba(0,0,0,.24)!important}.date-hero{padding:20px!important}.activity-section,.selected-day-card,.date-overview-grid,.context-bar,.nutrition-summary,.diet-layout,.form-grid,.record-grid{margin-top:14px!important}.section-heading{margin:18px 0 10px!important}.activity-grid,.part-grid{gap:9px!important}.part-card,.activity-card{min-height:105px!important;padding:14px!important;border-radius:16px!important}.part-card h3,.activity-card h3{margin:8px 0 3px!important}.part-icon,.activity-icon{font-size:22px!important}.selected-day-card{padding:17px!important}.summary-grid{gap:9px!important}.summary-item{padding:12px!important}.exercise-list{gap:10px!important}.custom-exercise,.exercise-card{padding:15px!important}.custom-exercise h3,.exercise-card h3{font-size:18px!important}.custom-meta,.chips{gap:5px!important}.chip{padding:5px 8px!important}.bottom-nav{background:rgba(18,19,21,.96)!important;border-color:rgba(255,255,255,.08)!important}.button.primary,.mini-button,.today-button{background:#34383e!important;color:#fff!important;border:1px solid rgba(255,255,255,.09)!important}.button.secondary,.text-button{background:#23262b!important;color:#d8dbe0!important}.progress i{background:linear-gradient(90deg,#8f969f,#d4d7dc)!important}.session-card{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding:15px;margin:12px 0}.session-main{display:flex;gap:16px;align-items:center}.session-time{font-size:25px;font-weight:850;letter-spacing:-.5px}.session-meta{color:var(--muted);font-size:12px;margin-top:3px}.session-actions{display:flex;gap:8px}.session-button{border:0;border-radius:12px;padding:11px 14px;font-weight:850;cursor:pointer}.session-start{background:#d7dade;color:#161719}.session-finish{background:#4b5057;color:#fff}.session-finish[disabled]{opacity:.45}.session-status{display:inline-flex;padding:5px 9px;border-radius:999px;background:#2b2f34;color:#cfd2d7;font-size:11px;font-weight:800;margin-left:8px}.session-status.done{background:rgba(98,166,126,.18);color:#a9ddb9}.day-complete-banner{padding:12px 14px;border-radius:14px;background:rgba(98,166,126,.12);border:1px solid rgba(98,166,126,.25);color:#b9dec5;font-size:13px;margin-top:10px}@media(max-width:650px){.session-card{grid-template-columns:1fr}.session-actions{width:100%}.session-button{flex:1}.session-main{justify-content:space-between}}
+    `;document.head.appendChild(s);
+  }
+
+  function get(){const all=sessions();return all[date()]||null}
+  function set(v){const all=sessions();all[date()]=v;write(SESSION_KEY,all)}
+  function format(sec){sec=Math.max(0,Math.floor(sec||0));return `${String(Math.floor(sec/3600)).padStart(2,'0')}:${String(Math.floor(sec%3600/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`}
+  function elapsed(s){if(!s?.startedAt)return 0;if(s.finishedAt)return s.durationSec||0;return Math.floor((Date.now()-s.startedAt)/1000)}
+  function stats(){const sets=[...document.querySelectorAll('.custom-set')];return{total:sets.length,done:sets.filter(x=>x.classList.contains('done')).length}}
+  function selectedParts(){return [...document.querySelectorAll('.part-card.selected[data-part] h3')].map(x=>x.textContent.trim())}
+
+  function render(){
+    const workout=document.querySelector('#workout');if(!workout)return;
+    let card=document.querySelector('#sessionCard');
+    if(!card){card=document.createElement('section');card.id='sessionCard';card.className='session-card card';const anchor=workout.querySelector('.context-bar');anchor?.after(card)}
+    const s=get(),sec=elapsed(s),st=stats(),done=!!s?.finishedAt;
+    card.innerHTML=`<div class="session-main"><div><span class="label">WORKOUT SESSION</span><div><span class="session-time" id="sessionTime">${format(sec)}</span><span class="session-status ${done?'done':''}">${done?'운동 완료':s?.startedAt?'진행 중':'대기'}</span></div><div class="session-meta">${done?`${s.doneSets||0}/${s.totalSets||0}세트 · ${s.parts?.join(' + ')||'운동'}`:st.total?`${st.done}/${st.total}세트 체크됨`:'부위를 먼저 선택하세요'}</div></div></div><div class="session-actions"><button class="session-button session-start" type="button" data-session="start">${s?.startedAt&&!done?'재시작':'START'}</button><button class="session-button session-finish" type="button" data-session="finish" ${!s?.startedAt||done?'disabled':''}>운동 완료</button></div>`;
+    renderDateStatus();
+  }
+
+  function renderDateStatus(){
+    const s=get();const host=document.querySelector('#selectedDayCard');if(!host)return;
+    let b=document.querySelector('#dayCompleteBanner');
+    if(s?.finishedAt){if(!b){b=document.createElement('div');b.id='dayCompleteBanner';b.className='day-complete-banner';host.appendChild(b)}b.textContent=`✓ 운동 완료 · ${format(s.durationSec)} · ${s.doneSets}/${s.totalSets}세트`;}
+    else b?.remove();
+  }
+
+  function start(){const prev=get();set({...(prev||{}),startedAt:Date.now(),finishedAt:null,durationSec:0,parts:selectedParts()});render();startTicker()}
+  function finish(){const s=get();if(!s?.startedAt)return;const st=stats();set({...s,finishedAt:Date.now(),durationSec:Math.floor((Date.now()-s.startedAt)/1000),doneSets:st.done,totalSets:st.total,parts:selectedParts()});stopTicker();render();document.querySelector('#toast')?.replaceChildren(document.createTextNode('오늘 운동을 완료로 저장했어요'));const t=document.querySelector('#toast');t?.classList.add('show');setTimeout(()=>t?.classList.remove('show'),1800)}
+  function startTicker(){stopTicker();ticker=setInterval(()=>{const el=document.querySelector('#sessionTime');if(el)el.textContent=format(elapsed(get()))},1000)}
+  function stopTicker(){if(ticker)clearInterval(ticker);ticker=null}
+  function bind(){document.addEventListener('click',e=>{const b=e.target.closest('[data-session]');if(b){b.dataset.session==='start'?start():finish();return}if(e.target.closest('[data-custom-set],[data-part],[data-rest],[data-action="select-date"],[data-action="shift-date"],[data-action="go-today"],[data-action="open-history-date"]'))setTimeout(render,80)});document.querySelector('#datePicker')?.addEventListener('change',()=>setTimeout(render,80))}
+  function init(){injectTheme();render();bind();if(get()?.startedAt&&!get()?.finishedAt)startTicker();new MutationObserver(()=>{clearTimeout(init.m);init.m=setTimeout(render,80)}).observe(document.body,{childList:true,subtree:true})}
+  window.YGO_SESSION={init};
+})();

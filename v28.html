@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#050505">
+<meta name="description" content="용호의 날짜별 운동 기록 앱">
+<title>용호의 운동 · 이미지 v28</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="stylesheet" href="./styles.css?v=28">
+<link rel="stylesheet" href="./images-v28.css?v=28">
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(list=>list.forEach(reg=>reg.unregister())).catch(()=>{});}
+if('caches' in window){caches.keys().then(keys=>Promise.all(keys.map(key=>caches.delete(key)))).catch(()=>{});}
+</script>
+</head>
+<body>
+<main class="앱">
+<section class="홈화면" id="홈화면">
+<header class="상단바"><div><p class="작은문구">용호의 운동</p><h1 id="날짜제목">오늘</h1><p class="보조문구" id="요일제목"></p><span class="이미지버전" id="이미지버전">실사 이미지 v28 연결 중</span></div><label class="날짜아이콘" aria-label="날짜 선택"><input id="날짜입력" type="date"><span></span></label></header>
+<section class="대표영역"><div class="대표사진" id="대표사진"></div><div class="대표그라데이션"></div><div class="대표내용"><p class="작은문구">오늘 운동</p><h2 id="선택요약">운동 부위를 골라주세요</h2><div class="예상정보"><div><span>예상 운동시간</span><strong id="예상시간">0분</strong></div><div><span>예상 세트</span><strong id="예상세트">0세트</strong></div></div><button class="주버튼" id="운동시작">운동 시작 <span>›</span></button></div></section>
+<section class="선택영역" id="선택영역"><div class="구역제목"><h2>운동 부위 선택</h2><button id="전체해제">전체 해제</button></div><div class="부위목록" id="부위목록"></div></section>
+</section>
+<section class="운동화면" id="운동화면" hidden><header class="운동상단"><button id="뒤로가기" aria-label="뒤로가기">‹</button><div><p>오늘 운동</p><h2 id="집중제목">운동</h2></div><div class="운동시간" id="운동시간">00:00:00</div></header><div class="진행바"><i id="진행바"></i></div><div class="운동목록" id="운동목록"></div><button class="완료버튼" id="운동완료">운동 완료</button></section>
+</main>
+<div class="휴식창" id="휴식창" hidden><div><span>휴식 시간</span><strong id="휴식시간">01:30</strong></div><button id="휴식중지">건너뛰기</button></div>
+<div class="알림" id="알림"></div>
+<script src="./assets-v27.js?v=28"></script>
+<script src="./app-v28.js?v=28" defer></script>
+</body>
+</html>

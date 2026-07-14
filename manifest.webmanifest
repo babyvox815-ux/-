@@ -1,9 +1,9 @@
 {
-  "name":"YONGHO GYM OS",
-  "short_name":"GYM OS",
+  "name":"용호의 운동",
+  "short_name":"운동",
   "start_url":"./",
   "display":"standalone",
-  "background_color":"#050a12",
-  "theme_color":"#07101d",
+  "background_color":"#0b0b0c",
+  "theme_color":"#0b0b0c",
   "icons":[]
 }

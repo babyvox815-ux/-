@@ -1,0 +1,67 @@
+:root{--운동원본:none}
+
+/* 시안 한 장에서 사람/운동 장면만 잘라 표시합니다. */
+.대표사진,.부위사진,.운동사진{
+  background-image:var(--운동원본)!important;
+  background-repeat:no-repeat!important;
+  background-color:#111311!important;
+  transform:none!important;
+  filter:none!important;
+}
+
+/* 메인에서는 이미지가 글자 뒤를 덮지 않도록 하단의 깨끗한 운동 장면만 사용 */
+.대표영역{min-height:650px;background:#050505}
+.대표사진{
+  top:196px!important;
+  bottom:0!important;
+  opacity:.92;
+}
+.대표그라데이션{
+  background:linear-gradient(180deg,#050505 0%,rgba(5,5,5,.92) 18%,rgba(5,5,5,.16) 47%,rgba(5,5,5,.42) 68%,#050505 100%)!important;
+}
+.대표내용{z-index:3}
+
+/* 실제 사람 이미지 비율에 맞춘 가로형 선택 카드 */
+.선택영역{padding-top:38px}
+.부위목록{gap:13px}
+.부위버튼{
+  min-height:0!important;
+  aspect-ratio:1.43/1;
+  border-radius:19px!important;
+  background:#101210!important;
+}
+.부위사진{inset:0!important}
+.부위그늘{
+  background:linear-gradient(180deg,rgba(0,0,0,.02) 20%,rgba(0,0,0,.18) 58%,rgba(0,0,0,.88) 100%)!important;
+}
+.부위내용{bottom:12px!important}
+.부위내용 h3{font-size:18px!important;text-shadow:0 2px 10px #000}
+.부위내용 p{font-size:11px!important;color:#b1b4af!important}
+.부위버튼.선택됨 .부위사진{filter:none!important}
+
+/* 운동별 썸네일도 실제 운동 동작이 보이는 가로 비율로 통일 */
+.운동목록{padding-left:20px!important;padding-right:20px!important}
+.운동카드{
+  grid-template-columns:134px minmax(0,1fr)!important;
+  gap:16px!important;
+  padding:13px 0!important;
+  align-items:center;
+}
+.운동사진{
+  width:134px;
+  min-height:0!important;
+  aspect-ratio:1.58/1;
+  border-radius:15px!important;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.055);
+}
+.운동본문 h3{margin-top:0!important}
+
+/* 작은 화면에서도 썸네일이 찌그러지거나 사라지지 않도록 유지 */
+@media(max-width:390px){
+  .대표영역{min-height:620px}
+  .대표사진{top:205px!important}
+  .운동카드{grid-template-columns:116px minmax(0,1fr)!important;gap:13px!important}
+  .운동사진{width:116px}
+  .세트줄{gap:6px!important}
+  .세트버튼{width:36px!important;height:36px!important}
+}

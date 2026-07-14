@@ -1,0 +1,37 @@
+(() => {
+  'use strict';
+  const css=`
+  :root{--bg:#070809!important;--surface:#0e1012!important;--surface-2:#14171a!important;--surface-3:#1a1e22!important;--line:rgba(255,255,255,.075)!important;--text:#f2f4f5!important;--muted:#8e959d!important;--cyan:#6fe7d2!important;--blue:#73a7d8!important;--green:#8fd3a7!important;--red:#d9858e!important}
+  html,body{background:#070809!important}body{background:linear-gradient(180deg,#070809 0%,#0a0c0e 100%)!important}.ambient{display:none!important}
+  .app-shell{width:min(980px,calc(100% - 24px))!important;margin:auto!important}.app-header{padding:18px 0 10px!important}.app-header .eyebrow{color:#747b82!important}.app-header h1{font-size:clamp(24px,5vw,34px)!important}.app-header h1 span{color:var(--cyan)!important;text-shadow:none!important}.app-header .icon-button{display:none!important}
+  .card{background:#0e1012!important;border:1px solid var(--line)!important;border-radius:18px!important;box-shadow:0 12px 28px rgba(0,0,0,.28)!important}
+  .date-hero{padding:18px!important}.date-control{gap:8px!important}.date-arrow,.date-picker-button,.today-button,.mini-button,.button,.session-button{min-height:42px!important;border-radius:12px!important}
+  .week-strip{display:grid!important;grid-template-columns:repeat(7,1fr)!important;gap:7px!important}.week-day{min-width:0!important;padding:10px 5px!important;border-radius:12px!important;background:#111417!important;border-color:var(--line)!important}.week-day.selected{background:#18231f!important;border-color:rgba(111,231,210,.45)!important;color:var(--cyan)!important;box-shadow:none!important}
+  .activity-section{margin-top:16px!important}.section-heading,.compact-heading{margin:0 0 10px!important}.section-heading h2,.compact-heading h2{font-size:22px!important}.subtext{font-size:13px!important}.part-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:9px!important}.part-card{min-height:108px!important;padding:14px!important;border-radius:15px!important;background:#101316!important;box-shadow:none!important}.part-card:hover{transform:none!important}.part-card.selected{background:#14201d!important;border-color:rgba(111,231,210,.55)!important;box-shadow:inset 0 0 0 1px rgba(111,231,210,.12)!important}.part-icon{width:38px!important;height:38px!important;border-radius:11px!important;background:#171a1d!important;color:#aeb5bb!important;border-color:var(--line)!important}.part-card.selected .part-icon{color:var(--cyan)!important;border-color:rgba(111,231,210,.25)!important}.part-card h3{font-size:16px!important;margin:9px 0 3px!important}.part-card p{font-size:11px!important}.part-toolbar{margin-top:9px!important;padding:12px 14px!important}
+  .selected-day-card{margin-top:14px!important;padding:16px!important}.selected-day-head{align-items:center!important}.summary-grid{grid-template-columns:1fr!important}.summary-item{padding:12px!important}.summary-item:not(:first-child){display:none!important}.date-overview-grid{display:none!important}
+  #workout .context-bar{margin-top:0!important;padding:13px 15px!important}.session-card{margin:10px 0!important;padding:14px!important}.session-start{background:var(--cyan)!important;color:#06100d!important;box-shadow:none!important}.session-finish{background:#171b1f!important;border:1px solid var(--line)!important;color:#d9dcdf!important}.session-finish:not([disabled]){border-color:rgba(143,211,167,.35)!important;color:var(--green)!important;box-shadow:none!important}
+  .custom-workout-head{margin:14px 0 10px!important}.workout-summary{padding:14px!important}.progress{height:7px!important;background:#171a1d!important}.progress i{background:var(--cyan)!important;box-shadow:none!important}.exercise-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.custom-exercise{padding:15px!important;min-width:0!important}.custom-exercise h3{font-size:18px!important}.custom-meta{gap:6px!important}.chip{background:#15181b!important;border:1px solid var(--line)!important;color:#aeb4ba!important}.video-link{margin-left:0!important;background:#151a1e!important;border:1px solid rgba(115,167,216,.25)!important;color:#8fb9df!important;box-shadow:none!important}.custom-set{border-radius:10px!important;background:#171a1e!important}.custom-set.done{background:var(--cyan)!important;color:#05100d!important;box-shadow:none!important}
+  .bottom-nav{width:min(420px,calc(100% - 24px))!important;left:50%!important;transform:translateX(-50%)!important;grid-template-columns:1fr 1fr!important;background:rgba(9,10,11,.97)!important;border:1px solid var(--line)!important;border-radius:16px!important;bottom:10px!important;padding:6px!important}.bottom-tab{border-radius:11px!important;color:#8d949b!important}.bottom-tab.active{background:#151b19!important;color:var(--cyan)!important;text-shadow:none!important}
+  main{padding-bottom:94px!important}
+  @media(max-width:760px){.part-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.exercise-list{grid-template-columns:1fr!important}.date-hero-top{align-items:flex-start!important}.selected-day-head{align-items:flex-start!important;flex-direction:column!important}.selected-day-head .button{width:100%!important}.week-strip{gap:5px!important}.week-day{padding:8px 2px!important}.session-card{grid-template-columns:1fr!important}.session-actions{width:100%!important}.session-button{flex:1!important}}
+  `;
+  function simplify(){
+    ['diet','history','record'].forEach(id=>document.getElementById(id)?.remove());
+    document.querySelectorAll('.bottom-tab').forEach(btn=>{if(!['date','workout'].includes(btn.dataset.tab))btn.remove()});
+    document.querySelector('.date-overview-grid')?.remove();
+    const summary=document.querySelector('.summary-grid');if(summary){[...summary.children].slice(1).forEach(x=>x.remove())}
+    const settings=document.querySelector('[data-action="open-settings"]');settings?.remove();
+    document.getElementById('settingsModal')?.remove();document.getElementById('customFoodModal')?.remove();
+    const foodButton=document.querySelector('[data-tab="diet"]');foodButton?.remove();
+    const h=document.querySelector('.app-header h1');if(h)h.innerHTML='YONGHO <span>WORKOUT</span>';
+    const eyebrow=document.querySelector('.app-header .eyebrow');if(eyebrow)eyebrow.textContent='DAILY TRAINING LOG';
+    const daily=document.querySelector('.activity-section .section-heading h2');if(daily)daily.textContent='오늘 운동 부위';
+    const dailySub=document.querySelector('.activity-section .subtext');if(dailySub)dailySub.textContent='부위를 선택해 조합하고 세트를 체크하세요.';
+    const summaryLabel=document.querySelector('#selectedDayCard .label');if(summaryLabel)summaryLabel.textContent='WORKOUT SUMMARY';
+    const cta=document.getElementById('selectedActivityCta');if(cta)cta.textContent='운동 열기';
+    document.querySelectorAll('[data-action="go-tab"][data-tab="date"]').forEach(b=>{if(b.closest('.bottom-nav'))return;b.textContent='날짜·부위 변경'});
+    document.querySelectorAll('[data-action="go-tab"][data-tab="workout"]').forEach(b=>{if(!b.closest('.bottom-nav'))b.textContent='운동 열기'});
+  }
+  function init(){const s=document.createElement('style');s.id='workout-only-style';s.textContent=css;document.head.appendChild(s);simplify();new MutationObserver(()=>{clearTimeout(init.t);init.t=setTimeout(simplify,80)}).observe(document.body,{childList:true,subtree:true})}
+  window.YGO_WORKOUT_ONLY={init};
+})();

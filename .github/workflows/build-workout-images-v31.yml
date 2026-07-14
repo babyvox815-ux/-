@@ -1,11 +1,9 @@
 name: Build workout images v31
 
 on:
-  push:
+  pull_request_target:
     branches: [main]
-    paths:
-      - 'scripts/build_workout_assets_v31.py'
-      - '.github/workflows/build-workout-images-v31.yml'
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
 
 permissions:
@@ -66,5 +64,3 @@ jobs:
             git commit -m 'Deploy verified individual workout images v31'
             git push origin gh-pages
           fi
-
-# deployment trigger: 2026-07-15-v31

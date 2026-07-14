@@ -66,3 +66,5 @@ jobs:
             git commit -m 'Deploy verified individual workout images v31'
             git push origin gh-pages
           fi
+
+# deployment trigger: 2026-07-15-v31

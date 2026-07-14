@@ -1,5 +1,5 @@
-const CACHE='ygo-v15';
-const ASSETS=['./','./index.html','./styles.css?v=8','./app.js?v=15','./app-old.js?v=8','./icons.js?v=15','./parts.js?v=13','./session.js?v=13','./theme14.js?v=14','./workout-only.js?v=15','./manifest.webmanifest'];
+const CACHE='ygo-v16';
+const ASSETS=['./','./index.html','./styles.css?v=8','./app.js?v=16','./app-old.js?v=8','./icons.js?v=16','./parts.js?v=13','./session.js?v=13','./theme14.js?v=14','./workout-only.js?v=16','./manifest.webmanifest'];
 self.addEventListener('install',event=>{self.skipWaiting();event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)))});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;event.respondWith(fetch(event.request).then(response=>{const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));return response}).catch(()=>caches.match(event.request)))});

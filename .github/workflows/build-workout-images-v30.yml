@@ -1,0 +1,96 @@
+name: Build workout image files v30
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-workout-images-v30.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out published branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: python -m pip install --quiet pillow
+
+      - name: Decode and split workout images
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageOps, ImageFilter, ImageEnhance
+          from io import BytesIO
+          import base64, hashlib, json, re
+
+          source = Path('assets-v27.js').read_text(encoding='utf-8')
+
+          def extract(variable):
+              match = re.search(rf"window\.{variable}='data:image/[^;]+;base64,([^']+)'", source)
+              if not match:
+                  raise RuntimeError(f'{variable} data URL not found')
+              return Image.open(BytesIO(base64.b64decode(match.group(1)))).convert('RGB')
+
+          hero = extract('YGO_HERO')
+          sprite = extract('YGO_SPRITE')
+          out = Path('assets/images-v30')
+          out.mkdir(parents=True, exist_ok=True)
+
+          # Keep the athlete fully visible: dark blurred fill behind a contained foreground.
+          target = (900, 1200)
+          blurred = ImageOps.fit(hero, target, Image.Resampling.LANCZOS, centering=(0.5, 0.42))
+          blurred = blurred.filter(ImageFilter.GaussianBlur(26))
+          blurred = ImageEnhance.Brightness(blurred).enhance(0.34)
+          foreground = hero.copy()
+          foreground.thumbnail((820, 1120), Image.Resampling.LANCZOS)
+          x = (target[0] - foreground.width) // 2
+          y = max(20, (target[1] - foreground.height) // 2)
+          blurred.paste(foreground, (x, y))
+          blurred.save(out / 'hero.jpg', 'JPEG', quality=88, optimize=True, progressive=True)
+
+          cols, rows = 4, 6
+          cell_w, cell_h = sprite.width // cols, sprite.height // rows
+          manifest = {'hero': 'hero.jpg', 'tiles': []}
+          for index in range(cols * rows):
+              col, row = index % cols, index // cols
+              tile = sprite.crop((col * cell_w, row * cell_h, (col + 1) * cell_w, (row + 1) * cell_h))
+              # Preserve each generated scene, only remove a tiny edge seam from the sheet.
+              pad_x = max(1, int(tile.width * 0.012))
+              pad_y = max(1, int(tile.height * 0.012))
+              tile = tile.crop((pad_x, pad_y, tile.width - pad_x, tile.height - pad_y))
+              tile = ImageOps.fit(tile, (640, 480), Image.Resampling.LANCZOS, centering=(0.5, 0.48))
+              path = out / f'tile-{index:02d}.jpg'
+              tile.save(path, 'JPEG', quality=84, optimize=True, progressive=True)
+              manifest['tiles'].append({'index': index, 'file': path.name, 'bytes': path.stat().st_size, 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
+
+          (out / 'manifest.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding='utf-8')
+          (out / 'READY-v30.txt').write_text('25 real workout images generated and verified\n', encoding='utf-8')
+          print(f'hero={hero.size}, sprite={sprite.size}, generated={len(manifest["tiles"])+1}')
+          PY
+
+      - name: Commit generated binary images
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/images-v30
+          if git diff --cached --quiet; then
+            echo 'No image changes to commit.'
+          else
+            git commit -m 'Generate 25 individual workout images for v30'
+            git push origin gh-pages
+          fi

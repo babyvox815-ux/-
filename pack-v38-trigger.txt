@@ -1,0 +1,1 @@
+Inspect the generated high-resolution workout image pack before deployment.

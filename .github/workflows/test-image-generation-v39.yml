@@ -1,0 +1,35 @@
+name: Test workout image generation v39
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/test-image-generation-v39.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate one high-resolution fitness image
+        run: |
+          mkdir -p image-test
+          python - <<'PY'
+          import urllib.parse, urllib.request
+          prompt = 'cinematic editorial fitness photography, athletic Korean man performing a deep barbell back squat in a premium dark gym, black sportswear, realistic anatomy, sharp focus, subtle emerald accent lighting, no text, vertical composition'
+          url = 'https://image.pollinations.ai/prompt/' + urllib.parse.quote(prompt) + '?width=768&height=1024&seed=3901&nologo=true&enhance=true'
+          print(url)
+          urllib.request.urlretrieve(url, 'image-test/squat.jpg')
+          PY
+          file image-test/squat.jpg
+          test $(stat -c%s image-test/squat.jpg) -gt 20000
+      - uses: actions/upload-artifact@v4
+        with:
+          name: workout-image-v39-test
+          path: image-test/squat.jpg
+          if-no-files-found: error

@@ -1,8 +1,11 @@
-name: Deploy YONGHO GYM OS to GitHub Pages
+name: Deploy Portfolio to GitHub Pages
 
 on:
   push:
     branches: ["main"]
+    paths:
+      - "portfolio/**"
+      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:
@@ -26,13 +29,11 @@ jobs:
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
-      - name: Upload static site
+      - name: Upload portfolio
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: ./portfolio
 
       - name: Deploy to GitHub Pages
         id: deployment

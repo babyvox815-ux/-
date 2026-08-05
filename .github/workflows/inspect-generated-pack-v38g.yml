@@ -1,0 +1,42 @@
+name: Inspect generated workout images v38g
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/inspect_generated_pack_v38g.py'
+      - '.github/workflows/inspect-generated-pack-v38g.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          git fetch origin gh-pages --depth=1
+          git checkout origin/gh-pages -- assets-v37
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --upgrade pip pillow pillow-avif-plugin
+      - name: Decode and inspect
+        continue-on-error: true
+        run: |
+          mkdir -p pack-v38g-output
+          python scripts/inspect_generated_pack_v38g.py > pack-v38g-output/run.log 2>&1
+          echo $? > pack-v38g-output/exit-code.txt
+      - name: Print report
+        if: always()
+        run: |
+          cat pack-v38g-output/run.log || true
+          cat pack-v38g-output/report.txt || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: generated-pack-v38g-preview
+          path: pack-v38g-output/
+          if-no-files-found: error
